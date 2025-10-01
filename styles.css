@@ -696,3 +696,6 @@
                 text-align: center;
             }
         }
+
+/* Map needs a fixed height */
+#map { height: 400px; }  
