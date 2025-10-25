@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Matching Quiz - Soulmate</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-dark': '#304A47',
+                        'brand-dark-hover': '#243A37',
+                        'brand-light': '#F8F0CE',
+                        'brand-accent': '#F4E8B8',
+                        'brand-accent-hover': '#F1E2A8',
+                        'brand-text': 'rgba(48, 74, 71, 0.8)',
+                        'brand-text-light': 'rgba(48, 74, 71, 0.7)',
+                    },
+                    fontFamily: {
+                        poppins: ['Poppins', '-apple-system', 'Roboto', 'Helvetica', 'sans-serif'],
+                    },
+                    maxWidth: {
+                        '8xl': '1280px',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-poppins leading-relaxed text-brand-dark bg-brand-light">
+
+    <!-- Header -->
+    <header id="page-header" class="bg-white shadow-sm fixed top-0 left-0 right-0 z-50 h-[72px] transition-colors duration-300">
+        <div class="max-w-8xl mx-auto px-6">
+            <div class="flex items-center justify-between h-[72px]">
+                <a href="index.html" class="flex items-center gap-3">
+                    <div class="logo-container">
+                        <img src="assets/Soulmate_recolor.png" alt="Soulmate Logo" style="width: 350px; height: 200px; ">
+                    </div>
+                </a>
+                <nav class="hidden lg:flex items-center gap-8">
+                    <a href="index.html#how-it-works" class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">How It Works</a>
+                    <a href="index.html#features" class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">Features</a>
+                    <a href="index.html#success-stories" class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">Success Stories</a>
+                    <a href="test-map.html" class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">Find Shelters</a>
+                    <a href="index.html#contact" class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">Contact</a>
+                </nav>
+                <div class="flex items-center gap-4">
+                    <a href="index.html" class="hidden sm:inline-block bg-brand-accent hover:bg-brand-accent-hover rounded-full py-2 px-6 text-brand-dark font-medium no-underline transition-transform hover:-translate-y-0.5">Back to Home</a>
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-btn" class="lg:hidden text-brand-dark text-3xl z-20">
+                        ☰
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu" class="hidden lg:hidden absolute top-0 left-0 right-0 bg-white shadow-lg pt-[72px]">
+            <nav class="flex flex-col p-4 gap-4">
+                <a href="index.html#how-it-works" class="text-brand-dark no-underline p-2 rounded hover:bg-gray-100">How It Works</a>
+                <a href="index.html#features" class="text-brand-dark no-underline p-2 rounded hover:bg-gray-100">Features</a>
+                <a href="index.html#success-stories" class="text-brand-dark no-underline p-2 rounded hover:bg-gray-100">Success Stories</a>
+                <a href="test-map.html" class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">Find Shelters</a>
+                <a href="index.html#contact" class="text-brand-dark no-underline p-2 rounded hover:bg-gray-100">Contact</a>
+                <a href="index.html" class="mt-2 sm:hidden bg-brand-accent hover:bg-brand-accent-hover rounded-full py-2 px-6 text-brand-dark font-medium no-underline text-center">Back to Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="pt-[72px]">
+        <!-- Quiz Header -->
+        <section class="bg-[linear-gradient(135deg,_#F8F0CE_0%,_#F4E8B8_70.71%)] py-16">
+            <div class="max-w-8xl mx-auto px-6">
+                <div class="text-center">
+                    <h1 class="text-4xl md:text-5xl font-bold leading-tight text-brand-dark mb-4">
+                        Find Your Perfect <span class="text-brand-text-light">Pet Match</span>
+                    </h1>
+                    <p class="text-lg md:text-xl leading-7 text-brand-text max-w-3xl mx-auto mb-8">
+                        Answer a few questions about your lifestyle and preferences to discover the ideal pet companion for you.
+                    </p>
+                    <div class="flex items-center justify-center gap-4 mb-8">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-brand-dark">5-10</div>
+                            <div class="text-sm text-brand-text-light">Minutes</div>
+                        </div>
+                        <div class="w-px h-8 bg-brand-text-light"></div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-brand-dark">15</div>
+                            <div class="text-sm text-brand-text-light">Questions</div>
+                        </div>
+                        <div class="w-px h-8 bg-brand-text-light"></div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-brand-dark">100%</div>
+                            <div class="text-sm text-brand-text-light">Free</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Progress Bar -->
+        <section class="bg-white py-4 border-b border-gray-200">
+            <div class="max-w-4xl mx-auto px-6">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-brand-dark">Progress</span>
+                    <span class="text-sm font-medium text-brand-dark" id="progress-text">Question 1 of 15</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-brand-dark h-2 rounded-full transition-all duration-300" id="progress-bar" style="width: 6.67%"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Container -->
+        <section class="bg-white py-16">
+            <div class="max-w-4xl mx-auto px-6">
+                <div id="quiz-container">
+                    <!-- Quiz questions will be dynamically inserted here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section (Hidden initially) -->
+        <section id="results-section" class="bg-brand-light py-16 hidden">
+            <div class="max-w-4xl mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-bold leading-tight text-brand-dark mb-4">Your Perfect Match!</h2>
+                    <p class="text-xl leading-7 text-brand-text">Based on your answers, here are the pets that best match your lifestyle.</p>
+                </div>
+                <div id="results-content">
+                    <!-- Results will be dynamically inserted here -->
+                </div>
+                <div class="text-center mt-12">
+                    <a href="test-map.html" class="bg-brand-dark hover:bg-brand-dark-hover text-white rounded-full py-4 px-8 text-lg font-semibold no-underline inline-flex items-center justify-center gap-2 transition-transform hover:-translate-y-0.5">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="white" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm-1-13h2v6h-2V5zm0 8h2v2h-2v-2z"/>
+                        </svg>
+                        Find Local Shelters
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white pt-16 pb-8">
+        <div class="max-w-8xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                <!-- Brand Info -->
+                <div class="lg:col-span-1 flex flex-col gap-6">
+                    <a href="index.html" class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-brand-dark flex items-center justify-center p-2"><svg width="18" height="18" viewBox="0 0 18 19" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M1.67344 10.8105L8.02617 16.7414C8.28984 16.9875 8.63789 17.1246 9 17.1246C9.36211 17.1246 9.71016 16.9875 9.97383 16.7414L16.3266 10.8105C17.3953 9.81559 18 8.41989 18 6.96091V6.757C18 4.29958 16.2246 2.20427 13.8023 1.79997C12.1992 1.53278 10.568 2.05661 9.42188 3.2027L9 3.62458L8.57812 3.2027C7.43203 2.05661 5.80078 1.53278 4.19766 1.79997C1.77539 2.20427 0 4.29958 0 6.757V6.96091C0 8.41989 0.604687 9.81559 1.67344 10.8105Z"/></svg></div>
+                        <span class="text-2xl font-bold text-brand-dark leading-8">Soulmate</span>
+                    </a>
+                    <p class="text-base text-brand-text-light">Connecting hearts with paws through intelligent pet matching and local shelter partnerships.</p>
+                </div>
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-lg font-bold text-brand-dark mb-4">Quick Links</h3>
+                    <ul class="flex flex-col gap-2">
+                        <li><a href="index.html" class="text-brand-text-light hover:text-brand-dark no-underline">Home</a></li>
+                        <li><a href="index.html#how-it-works" class="text-brand-text-light hover:text-brand-dark no-underline">How It Works</a></li>
+                        <li><a href="index.html#success-stories" class="text-brand-text-light hover:text-brand-dark no-underline">Success Stories</a></li>
+                        <li><a href="test-map.html" class="text-brand-text-light hover:text-brand-dark no-underline">Find Shelters</a></li>
+                    </ul>
+                </div>
+                <!-- Support Links -->
+                <div>
+                    <h3 class="text-lg font-bold text-brand-dark mb-4">Support</h3>
+                    <ul class="flex flex-col gap-2">
+                        <li><a href="#" class="text-brand-text-light hover:text-brand-dark no-underline">Help Center</a></li>
+                        <li><a href="index.html#contact" class="text-brand-text-light hover:text-brand-dark no-underline">Contact Us</a></li>
+                        <li><a href="#" class="text-brand-text-light hover:text-brand-dark no-underline">Pet Care Tips</a></li>
+                        <li><a href="#" class="text-brand-text-light hover:text-brand-dark no-underline">Adoption Guide</a></li>
+                    </ul>
+                </div>
+                <!-- Newsletter -->
+                <div>
+                    <h3 class="text-lg font-bold text-brand-dark mb-4">Stay Updated</h3>
+                    <p class="text-brand-text-light mb-4">Get pet care tips and adoption success stories</p>
+                    <form id="newsletter-form" class="flex mt-4">
+                        <input type="email" class="flex-1 py-2 px-4 border border-gray-300 rounded-l-full focus:outline-none focus:ring-2 focus:ring-brand-dark placeholder-gray-400" placeholder="Enter email">
+                        <button type="submit" class="bg-brand-dark hover:bg-brand-dark-hover rounded-r-full px-6 flex items-center justify-center">
+                            <svg width="14" height="16" viewBox="0 0 16 16" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M15.5656 0.175119C15.8812 0.393869 16.0468 0.771994 15.9875 1.15012L13.9875 14.1501C13.9406 14.4532 13.7562 14.7189 13.4875 14.8689C13.2187 15.0189 12.8968 15.0376 12.6125 14.9189L8.87496 13.3657L6.73433 15.6814C6.45621 15.9845 6.01871 16.0845 5.63433 15.9345C5.24996 15.7845 4.99996 15.4126 4.99996 15.0001V12.3876C4.99996 12.2626 5.04683 12.1439 5.13121 12.0532L10.3687 6.33762C10.55 6.14074 10.5437 5.83762 10.3562 5.65012C10.1687 5.46262 9.86558 5.45012 9.66871 5.62824L3.31246 11.2751L0.553084 9.89387C0.221834 9.72824 0.00933428 9.39699 -4.07251e-05 9.02824C-0.00941573 8.65949 0.184334 8.31574 0.503084 8.13137L14.5031 0.131369C14.8375 -0.0592555 15.25 -0.0405055 15.5656 0.175119Z"/></svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+                <p class="text-sm text-brand-text-light">© 2024 Soulmate. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a href="#" class="text-sm text-brand-text-light hover:text-brand-dark no-underline">Privacy Policy</a>
+                    <a href="#" class="text-sm text-brand-text-light hover:text-brand-dark no-underline">Terms of Service</a>
+                    <a href="#" class="text-sm text-brand-text-light hover:text-brand-dark no-underline">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Link to your JavaScript file -->
+    <script src="quiz.js"></script>
+</body>
+</html>

@@ -45,13 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // --- INTERACTIVE ALERTS (Quiz and Sample Buttons) ---
-    document.querySelectorAll('.js-quiz-trigger').forEach(button => {
-        button.addEventListener('click', e => {
-            e.preventDefault();
-            alert('Pet matching quiz coming soon!');
-        });
-    });
+    // --- INTERACTIVE ALERTS (Sample Buttons) ---
     
     document.querySelectorAll('.js-sample-trigger').forEach(button => {
         button.addEventListener('click', e => {
