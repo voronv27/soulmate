@@ -1,6 +1,6 @@
 const apiKey = '063ef3ad3bd243e48b9e4639ca2544f4'; // when testing, change this to the API key that allows localhost--contact Vicky if you need this
 
-// Finds the 'map' div element
+// Finds the 'map' div element (default location set to around Troy)
 var map = L.map('map').setView([43,-73], 10);
 
 var mapURL = L.Browser.retina
@@ -8,10 +8,9 @@ var mapURL = L.Browser.retina
   : `https://maps.geoapify.com/v1/tile/{mapStyle}/{z}/{x}/{y}@2x.png?apiKey={apiKey}`;
 
 // Get rough user location using IP address and set map view there as a starting point
-// Currently this isn't working--I need to see if I'm missing an import or if I need to add something to the API key
-/*fetch(`https://api.geoapify.com/v1/ipinfo?apiKey=${apiKey}`).then(result => result.json()).then(result => {
+fetch(`https://api.geoapify.com/v1/ipinfo?apiKey=${apiKey}`).then(result => result.json()).then(result => {
     map.setView([result.location.latitude, result.location.longitude], 8);
-});*/
+});
 
 // Add map tiles layer. Set 20 as the maximal zoom and provide map data attribution.
 L.tileLayer(mapURL, {

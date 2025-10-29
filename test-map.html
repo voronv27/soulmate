@@ -13,16 +13,57 @@
     <link rel="stylesheet" href="https://unpkg.com/@geoapify/leaflet-address-search-plugin@^1/dist/L.Control.GeoapifyAddressSearch.min.css" />
     <script src="https://unpkg.com/@geoapify/leaflet-address-search-plugin@^1/dist/L.Control.GeoapifyAddressSearch.min.js"></script>
 
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-dark': '#304A47',
+                        'brand-dark-hover': '#243A37',
+                        'brand-light': '#F8F0CE',
+                        'brand-accent': '#F4E8B8',
+                        'brand-accent-hover': '#F1E2A8',
+                        'brand-text': 'rgba(48, 74, 71, 0.8)',
+                        'brand-text-light': 'rgba(48, 74, 71, 0.7)',
+                    },
+                    fontFamily: {
+                        poppins: ['Poppins', '-apple-system', 'Roboto', 'Helvetica', 'sans-serif'],
+                    },
+                    maxWidth: {
+                        '8xl': '1280px',
+                    }
+                }
+            }
+        }
+    </script>
+
     <script src="findShelter.js" type="module" defer></script>
     <link rel="stylesheet" href="styles.css">
     <title>Test Map</title>
 </head>
-<body>
+<body class="font-poppins leading-relaxed text-brand-dark bg-brand-light">
     <p>Work in progress--map for shelter search</p><br>
     <div class="hero-image-container">
         <div class="hero-image-bg">
             <div id="map"></div>
         </div>
+    </div>
+
+    <div id="inputFields" class="bg-white rounded-2xl p-8">
+        <p>Location to center search around:</p>
+        <input type="text" id="location" placeholder="Enter your location" class="flex-1 py-2 px-4 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-dark placeholder-gray-400">
+        <br><br>
+        <p>Maximum distance from search location:</p>
+        <input type="text" id="radius" placeholder="Enter search radius" class="flex-1 py-2 px-4 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-dark placeholder-gray-400">
     </div>
 </body>
 </html>
