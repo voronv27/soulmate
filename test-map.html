@@ -2,6 +2,10 @@
  separate html page but we can change to href later if that's better -->
 <!DOCTYPE html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Shelters - Soulmate</title>
+    
     <!-- Leaflet CSS and JS for map--CSS should be imported before the JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -48,22 +52,60 @@
 
     <script src="findShelter.js" type="module" defer></script>
     <link rel="stylesheet" href="styles.css">
-    <title>Test Map</title>
 </head>
 <body class="font-poppins leading-relaxed text-brand-dark bg-brand-light">
-    <p>Work in progress--map for shelter search</p><br>
-    <div class="hero-image-container">
-        <div class="hero-image-bg">
-            <div id="map"></div>
+    <!-- Header -->
+    <header id="page-header" class="bg-white shadow-sm fixed top-0 left-0 right-0 z-50 h-[72px] transition-colors duration-300">
+        <div class="max-w-8xl mx-auto px-6">
+            <div class="flex items-center justify-between h-[72px]">
+                <a href="index.html" class="flex items-center gap-3">
+                    <div class="logo-container">
+                        <img src="assets/Soulmate_recolor.png" alt="Soulmate Logo" style="width: 350px; height: 200px; ">
+                    </div>
+                </a>
+                <nav class="hidden lg:flex items-center gap-8">
+                    <a href="index.html#how-it-works" class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">How It Works</a>
+                    <a href="index.html#features" class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">Features</a>
+                    <a href="index.html#success-stories" class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">Success Stories</a>
+                    <a href="test-map.html" class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">Find Shelters</a>
+                    <a href="index.html#contact" class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">Contact</a>
+                </nav>
+                <div class="flex items-center gap-4">
+                    <a href="index.html" class="hidden sm:inline-block bg-brand-accent hover:bg-brand-accent-hover rounded-full py-2 px-6 text-brand-dark font-medium no-underline transition-transform hover:-translate-y-0.5">Back to Home</a>
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-btn" class="lg:hidden text-brand-dark text-3xl z-20">
+                        ☰
+                    </button>
+                </div>
+            </div>
         </div>
-    </div>
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu" class="hidden lg:hidden absolute top-0 left-0 right-0 bg-white shadow-lg pt-[72px]">
+            <nav class="flex flex-col p-4 gap-4">
+                <a href="index.html#how-it-works" class="text-brand-dark no-underline p-2 rounded hover:bg-gray-100">How It Works</a>
+                <a href="index.html#features" class="text-brand-dark no-underline p-2 rounded hover:bg-gray-100">Features</a>
+                <a href="index.html#success-stories" class="text-brand-dark no-underline p-2 rounded hover:bg-gray-100">Success Stories</a>
+                <a href="test-map.html" class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">Find Shelters</a>
+                <a href="index.html#contact" class="text-brand-dark no-underline p-2 rounded hover:bg-gray-100">Contact</a>
+                <a href="index.html" class="mt-2 sm:hidden bg-brand-accent hover:bg-brand-accent-hover rounded-full py-2 px-6 text-brand-dark font-medium no-underline text-center">Back to Home</a>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="pt-[72px]">
+        <div class="hero-image-container">
+            <div class="hero-image-bg">
+                <div id="map"></div>
+            </div>
+        </div>
 
-    <div id="inputFields" class="bg-white rounded-2xl p-8">
-        <p>Location to center search around:</p>
-        <input type="text" id="location" placeholder="Enter your location" class="flex-1 py-2 px-4 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-dark placeholder-gray-400">
-        <br><br>
-        <p>Maximum distance from search location:</p>
-        <input type="text" id="radius" placeholder="Enter search radius" class="flex-1 py-2 px-4 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-dark placeholder-gray-400">
-    </div>
+        <div id="inputFields" class="bg-white rounded-2xl p-8">
+            <p>Location to center search around:</p>
+            <input type="text" id="location" placeholder="Enter your location" class="flex-1 py-2 px-4 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-dark placeholder-gray-400">
+            <br><br>
+            <p>Maximum distance from search location:</p>
+            <input type="text" id="radius" placeholder="Enter search radius" class="flex-1 py-2 px-4 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-dark placeholder-gray-400">
+        </div>
+    </main>
 </body>
 </html>
