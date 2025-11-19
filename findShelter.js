@@ -26,6 +26,20 @@ L.tileLayer(mapURL, {
 // Add in a layer for markers (points on the map)
 let markersLayer = L.layerGroup().addTo(map);
 
+// Custom star marker icon for shelters
+const star = L.divIcon({
+  className: "star-marker",
+  html: `
+    <svg viewBox="0 0 24 24" width="28" height="28" fill="#F4E8B8" stroke="#304A47" stroke-width="2" stroke-linejoin="round">
+      <path d="M12 2.5l3.1 6.4 7.1 1-5.2 5.1 1.2 7.1-6.2-3.3-6.2 3.3 1.2-7.1-5.2-5.1 7.1-1z"/>
+    </svg>
+  `,
+  iconSize: [28, 28],
+  iconAnchor: [14, 14],
+  popupAnchor: [0, -14]
+});
+
+
 // ---------------- SEARCH AND DISPLAY RESULTS ----------------
 // Geocode an address (get coordinates given an address). We need this to display markers on the map
 async function geocodeAddress(address) {
@@ -63,7 +77,7 @@ async function getShelters(lat, lon, radius) {
     return [];
   }
 
-  // Return lat, lon, name, and address for any shelter with
+  // Return lat, lon, and name for any shelter with
   // a latitude and longitude (required to display on map)
   const data = await response.json();
   return data.elements.map(
@@ -72,9 +86,6 @@ async function getShelters(lat, lon, radius) {
         lat: s.lat ?? s.center.lat,
         lon: s.lon ?? s.center.lon,
         name: s.tags.name || "Unnamed Shelter",
-        address:
-           [s.tags["addr:street"], s.tags["addr:city"], s.tags["addr:state"]]
-            .filter(Boolean).join(", ") || "No address listed"
       };
     }
   ).filter(s => s.lat && s.lon);
@@ -111,29 +122,33 @@ async function searchShelters() {
     alert("No shelters found in that area.");
     return;
   }
-  for (const s of shelters ) {
+  for (const s of shelters) {
     const lon = s.lon;
     const lat = s.lat;
     const name = s.name;
-    var addr = s.address;
-    if (addr == "No address listed") {
-      try {
-        // Try using geoapify to get the address with reverse geocoding
-        const revUrl = `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lon}&apiKey=${apiKey}`;
-        const revResp = await fetch(revUrl);
-        const revData = await revResp.json();
+    var addr = "No address listed";
+    try {
+      // Try using geoapify to get the address with reverse geocoding
+      const revUrl = `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lon}&apiKey=${apiKey}`;
+      const revResp = await fetch(revUrl);
+      const revData = await revResp.json();
 
-        const rev = revData.features?.[0]?.properties;
-        if (rev?.formatted) {
-          addr = rev.formatted;
-        }
-      } catch (err) {
-        console.warn("Reverse geocode failed:", err);
+      const rev = revData.features?.[0]?.properties;
+      if (rev?.formatted) {
+        addr = rev.formatted;
       }
+    } catch (err) {
+      console.warn("Reverse geocode failed:", err);
+      continue;
     }
 
-    const marker = L.marker([lat, lon]).addTo(markersLayer);
-    marker.bindPopup(`<b>${name}</b><br>${addr}`);
+    const marker = L.marker([lat, lon], {icon: star}).addTo(markersLayer);
+    marker.bindPopup(`<b>${name}</b><br>${addr}<br>
+      <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(addr)}"
+        target="_blank"
+        style="text-decoration: underline;">
+        Get Directions
+      </a>`);
   };
 }
 document.getElementById("mapSearchBtn").onclick = searchShelters;
