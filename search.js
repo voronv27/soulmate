@@ -1,38 +1,46 @@
 /**
- * Main entry point for the search page.
- * Waits for the DOM to be fully loaded before initializing.
+ * API Keys for TheDogAPI and TheCatAPI.
+ * Please replace 'YOUR_THEDOGAPI_KEY' and 'YOUR_THECATAPI_KEY' with your actual keys.
  */
-document.addEventListener('DOMContentLoaded', () => {
-    initializeSearchPage();
-});
+const DOG_API_KEY = 'live_MDVz1JPcd96dyCiBhfMyOlDkZ0Wi3rPm8Ry6nytOoyjX8gToNkHIC9MUMwxduiVa';
+const CAT_API_KEY = 'live_V6UfZeNGHVHQbhWynCTJDWa3HwsbyYBzdAsx23Ep9iQMR1ehy7TL7dHJCS9lmei6';
 
-/**
- * Initializes the search page by setting up event listeners
- * and fetching the initial set of breed data.
- */
+let allBreeds = []; // Stores all fetched breeds for client-side filtering
+let currentPage = 1;
+const breedsPerPage = 9; // Number of breeds to display per page
+
 function initializeSearchPage() {
     setupEventListeners();
-    // Fetch initial data on page load
-    fetchBreeds();
+    // Fetch all breed data once on page load
+    fetchAllBreedsAndRender();
 }
 
 /**
- * Sets up all necessary event listeners for the filter controls.
- * All filter changes will trigger a new call to `fetchBreeds`.
+ * Updates the results count display.
+ */
+function updateResultsCount(currentCount, totalCount) {
+    document.getElementById('results-count').textContent = `Showing ${currentCount} of ${totalCount} results`;
+}
+
+/**
+ * Sets up event listeners for filters and search.
  */
 function setupEventListeners() {
     const applyFiltersBtn = document.getElementById('apply-filters-btn');
     const searchInput = document.getElementById('breed-search');
+    const petTypeRadios = document.querySelectorAll('input[name="pet-type"]');
+    const sizeCheckboxes = document.querySelectorAll('#filter-size input[type="checkbox"]');
+    const charCheckboxes = document.querySelectorAll('#filter-characteristics input[type="checkbox"]');
     const sortDropdown = document.getElementById('sort-by');
     
     // Main filter button
     if (applyFiltersBtn) {
-        applyFiltersBtn.addEventListener('click', fetchBreeds);
+        applyFiltersBtn.addEventListener('click', () => fetchAndRenderFilteredBreeds(1)); // Reset to page 1 on filter apply
     }
     
     // Sort dropdown
     if (sortDropdown) {
-        sortDropdown.addEventListener('change', fetchBreeds);
+        sortDropdown.addEventListener('change', () => fetchAndRenderFilteredBreeds(1)); // Reset to page 1 on sort change
     }
     
     // Search input (triggers on pressing Enter)
@@ -40,16 +48,25 @@ function setupEventListeners() {
         searchInput.addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault(); // Stop form submission
-                fetchBreeds();
+                fetchAndRenderFilteredBreeds(1); // Reset to page 1 on search
             }
         });
     }
 
-    // You can also add 'change' listeners to the checkboxes and radio buttons
-    // to trigger `fetchBreeds` immediately, or rely on the "Apply Filters" button.
-    // Example:
-    // document.getElementById('filter-pet-type').addEventListener('change', fetchBreeds);
-    // document.getElementById('filter-size').addEventListener('change', fetchBreeds);
+    // Pet type radios
+    petTypeRadios.forEach(radio => {
+        radio.addEventListener('change', () => fetchAndRenderFilteredBreeds(1));
+    });
+
+    // Size checkboxes
+    sizeCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => fetchAndRenderFilteredBreeds(1));
+    });
+
+    // Characteristics checkboxes
+    charCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => fetchAndRenderFilteredBreeds(1));
+    });
 }
 
 /**
@@ -57,8 +74,8 @@ function setupEventListeners() {
  * @returns {object} An object containing all selected filter values.
  */
 function getFilters() {
-    // Get search term
-    const search = document.getElementById('breed-search').value;
+    // Get search term (trim whitespace)
+    const search = document.getElementById('breed-search').value.trim();
     
     // Get pet type
     const petTypeElement = document.querySelector('input[name="pet-type"]:checked');
@@ -83,15 +100,14 @@ function getFilters() {
         sort
     };
 
-    console.log('Filters collected:', filters);
     return filters;
 }
 
 /**
- * Fetches breed data from the API based on the current filters.
- * This is a MOCK function and should be replaced with a real API call.
+ * Fetches all dog and cat breeds from their respective APIs and stores them.
+ * This function is called once on page load.
  */
-async function fetchBreeds() {
+async function fetchAllBreedsAndRender() {
     const resultsGrid = document.getElementById('results-grid');
     const resultsCount = document.getElementById('results-count');
     
@@ -99,104 +115,170 @@ async function fetchBreeds() {
     resultsGrid.innerHTML = '<div class="loader lg:col-span-3"></div>';
     resultsCount.textContent = 'Loading results...';
 
-    // 2. Get all filter values
+    try {
+        const dogBreedsPromise = fetch('https://api.thedogapi.com/v1/breeds', {
+            headers: { 'x-api-key': DOG_API_KEY }
+        }).then(res => res.json());
+
+        const catBreedsPromise = fetch('https://api.thecatapi.com/v1/breeds', {
+            headers: { 'x-api-key': CAT_API_KEY }
+        }).then(res => res.json());
+
+        const [dogData, catData] = await Promise.all([dogBreedsPromise, catBreedsPromise]);
+
+        const mappedDogBreeds = dogData.map(breed => ({
+            id: `dog-${breed.id}`,
+            name: breed.name,
+            type: 'Dog',
+            description: breed.temperament ? `Temperament: ${breed.temperament}. Life Span: ${breed.life_span}.` : 'No description available.',
+            imageUrl: breed.image?.url || `https://placehold.co/600x400/F4E8B8/304A47?text=${breed.name.replace(' ', '+')}`,
+            learnMoreUrl: `https://www.google.com/search?q=${encodeURIComponent(breed.name + ' dog breed')}`,
+            weight: breed.weight, // { imperial: "60-100", metric: "27-45" }
+            height: breed.height, // { imperial: "23-24", metric: "58-61" }
+            temperament: breed.temperament,
+            hypoallergenic: breed.hypoallergenic || false,
+            child_friendly: breed.child_friendly || 0, // 1-5 scale
+            dog_friendly: breed.dog_friendly || 0,   // 1-5 scale
+            shedding_level: breed.shedding_level || 0 // 1-5 scale
+        }));
+
+        const mappedCatBreeds = catData.map(breed => ({
+            id: `cat-${breed.id}`,
+            name: breed.name,
+            type: 'Cat',
+            description: breed.temperament ? `Temperament: ${breed.temperament}. Life Span: ${breed.life_span}.` : 'No description available.',
+            imageUrl: breed.image?.url || `https://placehold.co/600x400/F4E8B8/304A47?text=${breed.name.replace(' ', '+')}`,
+            learnMoreUrl: `https://www.google.com/search?q=${encodeURIComponent(breed.name + ' cat breed')}`,
+            weight: breed.weight, // { imperial: "7-10", metric: "3-5" }
+            height: null, 
+            temperament: breed.temperament,
+            hypoallergenic: breed.hypoallergenic || false,
+            child_friendly: breed.child_friendly || 0, // 1-5 scale
+            dog_friendly: breed.dog_friendly || 0,   // 1-5 scale
+            shedding_level: breed.shedding_level || 0 // 1-5 scale
+        }));
+
+        allBreeds = [...mappedDogBreeds, ...mappedCatBreeds];
+        console.log('All breeds fetched:', allBreeds);
+
+        fetchAndRenderFilteredBreeds(1); // Render initial filtered results
+
+    } catch (error) {
+        console.error('Failed to fetch all breeds:', error);
+        resultsGrid.innerHTML = '<p class="text-brand-text-light lg:col-span-3">Failed to load breeds. Please check your API keys and network connection.</p>';
+        resultsCount.textContent = 'Error loading breeds.';
+    }
+}
+
+/**
+ * Filters and renders breeds based on current filter settings and page number.
+ * @param {number} page - The page number to render.
+ */
+function fetchAndRenderFilteredBreeds(page) {
+    currentPage = page;
+    const resultsGrid = document.getElementById('results-grid');
+    const resultsCount = document.getElementById('results-count');
+
+    resultsGrid.innerHTML = '<div class="loader lg:col-span-3"></div>';
+    resultsCount.textContent = 'Filtering results...';
+
     const filters = getFilters();
+    let filteredBreeds = [...allBreeds];
 
-    // 3. --- API INTEGRATION POINT ---
-    //
-    // Replace this `setTimeout` block with a real `fetch()` call to your API.
-    // Use the `filters` object to build your API query parameters.
-    //
-    // Example:
-    // try {
-    //     const params = new URLSearchParams();
-    //     params.append('search', filters.search);
-    //     params.append('type', filters.petType);
-    //     params.append('sort', filters.sort);
-    //     filters.sizes.forEach(size => params.append('size', size));
-    //     filters.characteristics.forEach(char => params.append('char', char));
-    //
-    //     const response = await fetch(`https://api.yourpetapi.com/v1/breeds?${params.toString()}`);
-    //     if (!response.ok) throw new Error('Network response was not ok');
-    //     
-    //     const data = await response.json();
-    //
-    //     renderResults(data.breeds); // 'data.breeds' or whatever your API returns
-    //     renderPagination(data.pagination.totalPages, data.pagination.currentPage);
-    //     resultsCount.textContent = `Showing ${data.pagination.start}-${data.pagination.end} of ${data.pagination.total} results`;
-    //
-    // } catch (error) {
-    //     console.error('Failed to fetch breeds:', error);
-    //     resultsGrid.innerHTML = '<p class="text-brand-text-light lg:col-span-3">Failed to load results. Please try again.</p>';
-    // }
-    //
-    // --- END API INTEGRATION POINT ---
+    // 1. Filter by Pet Type
+    if (filters.petType !== 'all') {
+        filteredBreeds = filteredBreeds.filter(breed => breed.type.toLowerCase() === filters.petType);
+    }
 
-    // --- MOCK DATA (Remove after API integration) ---
-    const mockBreeds = [
-        {
-            id: 1,
-            name: "Golden Retriever",
-            type: "Dog",
-            tags: ["Large", "Friendly", "Good with Kids"],
-            description: "Friendly, intelligent, and loyal. Golden Retrievers are great family pets.",
-            imageUrl: "https://placehold.co/600x400/F4E8B8/304A47?text=Golden+Retriever",
-            learnMoreUrl: "#"
-        },
-        {
-            id: 2,
-            name: "Siamese",
-            type: "Cat",
-            tags: ["Medium", "Vocal", "Social"],
-            description: "Known for their striking blue eyes and social, vocal personalities.",
-            imageUrl: "https://placehold.co/600x400/F4E8B8/304A47?text=Siamese",
-            learnMoreUrl: "#"
-        },
-        {
-            id: 3,
-            name: "Beagle",
-            type: "Dog",
-            tags: ["Medium", "Curious", "Merry"],
-            description: "Merry and fun-loving, Beagles are scent hounds who are curious and friendly.",
-            imageUrl: "https://placehold.co/600x400/F4E8B8/304A47?text=Beagle",
-            learnMoreUrl: "#"
-        },
-        {
-            id: 4,
-            name: "Maine Coon",
-            type: "Cat",
-            tags: ["Large", "Gentle Giant", "Fluffy"],
-            description: "One of the largest domesticated cat breeds, known for its gentle nature.",
-            imageUrl: "https://placehold.co/600x400/F4E8B8/304A47?text=Maine+Coon",
-            learnMoreUrl: "#"
-        },
-        {
-            id: 5,
-            name: "Poodle (Standard)",
-            type: "Dog",
-            tags: ["Large", "Hypoallergenic", "Intelligent"],
-            description: "Very smart and active. Their low-shedding coat is great for allergy sufferers.",
-            imageUrl: "https://placehold.co/600x400/F4E8B8/304A47?text=Poodle",
-            learnMoreUrl: "#"
-        },
-        {
-            id: 6,
-            name: "Ragdoll",
-            type: "Cat",
-            tags: ["Large", "Docile", "Affectionate"],
-            description: "Known for their tendency to go limp like a ragdoll when picked up.",
-            imageUrl: "https://placehold.co/600x400/F4E8B8/304A4T?text=Ragdoll",
-            learnMoreUrl: "#"
+    // 2. Filter by Search Term
+    if (filters.search) {
+        const searchTermLower = filters.search.toLowerCase();
+        filteredBreeds = filteredBreeds.filter(breed =>
+            breed.name.toLowerCase().includes(searchTermLower) ||
+            breed.description.toLowerCase().includes(searchTermLower) ||
+            (breed.temperament && breed.temperament.toLowerCase().includes(searchTermLower))
+        );
+    }
+
+    // 3. Filter by Size
+    if (filters.sizes.length > 0) {
+        filteredBreeds = filteredBreeds.filter(breed => {
+            const weightImperial = breed.weight?.imperial;
+            if (!weightImperial) return false;
+
+            const [minWeight, maxWeight] = weightImperial.split(' - ').map(Number);
+            const avgWeight = (minWeight + maxWeight) / 2;
+
+            if (isNaN(avgWeight)) return false;
+
+            let matchesSize = false;
+            if (filters.sizes.includes('small') && avgWeight < 20) {
+                matchesSize = true;
+            }
+            if (filters.sizes.includes('medium') && avgWeight >= 20 && avgWeight < 60) {
+                matchesSize = true;
+            }
+            if (filters.sizes.includes('large') && avgWeight >= 60) {
+                matchesSize = true;
+            }
+            return matchesSize;
+        });
+    }
+
+    // 4. Filter by Characteristics
+    if (filters.characteristics.length > 0) {
+        filteredBreeds = filteredBreeds.filter(breed => {
+            let matchesAllChars = true;
+            for (const char of filters.characteristics) {
+                switch (char) {
+                    case 'hypoallergenic':
+                        if (!breed.hypoallergenic) matchesAllChars = false;
+                        break;
+                    case 'good-with-kids':
+                        if (breed.child_friendly < 3) matchesAllChars = false; 
+                        break;
+                    case 'good-with-pets':
+                        if (breed.dog_friendly < 3) matchesAllChars = false;
+                        break;
+                    case 'low-shedding':
+                        if (breed.shedding_level > 2) matchesAllChars = false;
+                        break;
+                }
+                if (!matchesAllChars) break;
+            }
+            return matchesAllChars;
+        });
+    }
+
+    // 5. Sort Results
+    filteredBreeds.sort((a, b) => {
+        if (filters.sort === 'name-asc') {
+            return a.name.localeCompare(b.name);
+        } else if (filters.sort === 'name-desc') {
+            return b.name.localeCompare(a.name);
+        } else if (filters.sort === 'size-asc') {
+            const aWeight = parseFloat(a.weight?.imperial?.split(' - ')[0] || 0);
+            const bWeight = parseFloat(b.weight?.imperial?.split(' - ')[0] || 0);
+            return aWeight - bWeight;
+        } else if (filters.sort === 'size-desc') {
+            const aWeight = parseFloat(a.weight?.imperial?.split(' - ')[0] || 0);
+            const bWeight = parseFloat(b.weight?.imperial?.split(' - ')[0] || 0);
+            return bWeight - aWeight;
         }
-    ];
+        return 0; // Default or no sort
+    });
 
-    // Simulate network delay
-    setTimeout(() => {
-        renderResults(mockBreeds);
-        renderPagination(5, 1); // Mock: 5 total pages, currently on page 1
-        resultsCount.textContent = `Showing 1-6 of ${mockBreeds.length} results (Mock Data)`;
-    }, 1000);
-    // --- END MOCK DATA ---
+    // 6. Implement Pagination
+    const totalBreeds = filteredBreeds.length;
+    const totalPages = Math.ceil(totalBreeds / breedsPerPage);
+    const startIndex = (currentPage - 1) * breedsPerPage;
+    const endIndex = startIndex + breedsPerPage;
+    const breedsToRender = filteredBreeds.slice(startIndex, endIndex);
+
+    // 7. Render results and pagination
+    renderResults(breedsToRender);
+    renderPagination(totalPages, currentPage);
+    updateResultsCount(breedsToRender.length, totalBreeds);
 }
 
 /**
@@ -213,25 +295,30 @@ function renderResults(breeds) {
     }
 
     breeds.forEach(breed => {
-        // --- API DATA MAPPING ---
-        //
-        // Map your API's data fields to this HTML structure.
-        // For example, if your API uses `breed_name`, change `breed.name` to `breed.breed_name`.
-        //
         const breedName = breed.name || 'Unknown Breed';
         const breedImage = breed.imageUrl || `https://placehold.co/600x400/F4E8B8/304A47?text=${breedName.replace(' ', '+')}`;
         const breedDescription = breed.description || 'No description available.';
         const breedUrl = breed.learnMoreUrl || '#';
         
-        // Create tags HTML
-        // This assumes breed.tags is an array of strings. Adapt as needed.
-        let tagsHtml = `<span class="bg-brand-accent text-brand-dark text-xs font-semibold px-3 py-1 rounded-full">${breed.type || 'Pet'}</span>`;
-        if (breed.tags && Array.isArray(breed.tags)) {
-            tagsHtml += breed.tags.map(tag => 
-                `<span class="bg-brand-accent text-brand-dark text-xs font-semibold px-3 py-1 rounded-full">${tag}</span>`
-            ).join('');
+        let tagsHtml = `<span class="bg-brand-accent text-brand-dark text-xs font-semibold px-3 py-1 rounded-full">${breed.type}</span>`;
+        
+        // Add characteristics as tags
+        if (breed.hypoallergenic) tagsHtml += `<span class="bg-brand-accent text-brand-dark text-xs font-semibold px-3 py-1 rounded-full ml-1">Hypoallergenic</span>`;
+        if (breed.child_friendly >= 3) tagsHtml += `<span class="bg-brand-accent text-brand-dark text-xs font-semibold px-3 py-1 rounded-full ml-1">Good with Kids</span>`;
+        if (breed.dog_friendly >= 3) tagsHtml += `<span class="bg-brand-accent text-brand-dark text-xs font-semibold px-3 py-1 rounded-full ml-1">Good with Pets</span>`;
+        if (breed.shedding_level <= 2 && breed.shedding_level > 0) tagsHtml += `<span class="bg-brand-accent text-brand-dark text-xs font-semibold px-3 py-1 rounded-full ml-1">Low Shedding</span>`;
+        
+        // Add size tag based on average weight
+        const weightImperial = breed.weight?.imperial;
+        if (weightImperial) {
+            const [minWeight, maxWeight] = weightImperial.split(' - ').map(Number);
+            const avgWeight = (minWeight + maxWeight) / 2;
+            let sizeTag = '';
+            if (avgWeight < 20) sizeTag = 'Small';
+            else if (avgWeight >= 20 && avgWeight < 60) sizeTag = 'Medium';
+            else if (avgWeight >= 60) sizeTag = 'Large';
+            if (sizeTag) tagsHtml += `<span class="bg-brand-accent text-brand-dark text-xs font-semibold px-3 py-1 rounded-full ml-1">${sizeTag}</span>`;
         }
-        // --- END API DATA MAPPING ---
 
         const cardHtml = `
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl flex flex-col">
@@ -244,7 +331,7 @@ function renderResults(breeds) {
                     <p class="text-brand-text-light text-sm mb-4 flex-grow">
                         ${breedDescription}
                     </p>
-                    <a href="${breedUrl}" class="mt-auto inline-block text-center bg-brand-accent hover:bg-brand-accent-hover rounded-full py-2 px-5 text-brand-dark font-medium no-underline transition-transform hover:-translate-y-0.5">
+                    <a href="${breedUrl}" target="_blank" class="mt-auto inline-block text-center bg-brand-accent hover:bg-brand-accent-hover rounded-full py-2 px-5 text-brand-dark font-medium no-underline transition-transform hover:-translate-y-0.5">
                         Learn More
                     </a>
                 </div>
@@ -256,61 +343,73 @@ function renderResults(breeds) {
 
 /**
  * Renders the pagination links.
- * This is a MOCK function and should be updated to be dynamic.
- * @param {number} totalPages - The total number of pages from the API.
+ * @param {number} totalPages - The total number of pages.
  * @param {number} currentPage - The current active page.
  */
 function renderPagination(totalPages, currentPage) {
     const paginationContainer = document.getElementById('pagination-container');
-    
-    // --- API INTEGRATION ---
-    //
-    // This is a mock implementation. You should replace this with a dynamic
-    // function that builds the pagination links based on `totalPages` and `currentPage`.
-    //
-    // Each link should, when clicked, call `fetchBreeds()` and pass the
-    // new page number as part of the `getFilters()` logic.
-    //
-    
-    // Mock HTML:
-    paginationContainer.innerHTML = `
-        <ul class="flex items-center gap-2">
-            <!-- Previous (Disabled) -->
-            <li>
-                <span class="inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-400 bg-gray-100">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                </span>
-            </li>
-            <!-- Page 1 (Current) -->
-            <li class="page-item active">
-                <span class_name="inline-flex items-center justify-center w-10 h-10 rounded-full font-semibold text-white bg-brand-dark" aria-current="page">1</span>
-            </li>
-            <!-- Page 2 -->
-            <li class="page-item">
-                <a href="#" class="page-link inline-flex items-center justify-center w-10 h-10 rounded-full font-semibold text-brand-dark bg-white hover:bg-brand-accent" data-page="2">2</a>
-            </li>
-            <!-- Page 3 -->
-            <li class="page-item">
-                <a href="#" class="page-link inline-flex items-center justify-center w-10 h-10 rounded-full font-semibold text-brand-dark bg-white hover:bg-brand-accent" data-page="3">3</a>
-            </li>
-            <!-- Next -->
-            <li class="page-item">
-                <a href="#" class="page-link inline-flex items-center justify-center w-10 h-10 rounded-full font-semibold text-brand-dark bg-white hover:bg-brand-accent" data-page="2">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-                </a>
-            </li>
-        </ul>
-    `;
+    paginationContainer.innerHTML = ''; // Clear previous pagination
 
-    // Add event listeners to new pagination links
-    paginationContainer.querySelectorAll('.page-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const page = e.currentTarget.dataset.page;
-            console.log(`Go to page ${page}`);
-            // In a real app, you would add `page` to your filters
-            // and call `fetchBreeds()` again.
-            // e.g., fetchBreeds(page);
-        });
+    if (totalPages <= 1) {
+        return; // No pagination needed for 1 or fewer pages
+    }
+
+    const ul = document.createElement('ul');
+    ul.className = 'flex items-center gap-2';
+
+    // Previous button
+    const prevLi = document.createElement('li');
+    const prevButton = document.createElement('a');
+    prevButton.href = '#';
+    prevButton.className = `inline-flex items-center justify-center w-10 h-10 rounded-full font-semibold ${currentPage === 1 ? 'text-gray-400 bg-gray-100 cursor-not-allowed' : 'text-brand-dark bg-white hover:bg-brand-accent'}`;
+    prevButton.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>`;
+    prevButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (currentPage > 1) {
+            fetchAndRenderFilteredBreeds(currentPage - 1);
+        }
     });
+    prevLi.appendChild(prevButton);
+    ul.appendChild(prevLi);
+
+    // Page numbers
+    const maxPageButtons = 5; // Max number of page buttons to show
+    let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+    let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+    if (endPage - startPage + 1 < maxPageButtons) {
+        startPage = Math.max(1, endPage - maxPageButtons + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        const pageLi = document.createElement('li');
+        const pageButton = document.createElement('a');
+        pageButton.href = '#';
+        pageButton.className = `inline-flex items-center justify-center w-10 h-10 rounded-full font-semibold ${i === currentPage ? 'text-white bg-brand-dark' : 'text-brand-dark bg-white hover:bg-brand-accent'}`;
+        pageButton.textContent = i;
+        pageButton.dataset.page = i;
+        pageButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            fetchAndRenderFilteredBreeds(parseInt(e.currentTarget.dataset.page));
+        });
+        pageLi.appendChild(pageButton);
+        ul.appendChild(pageLi);
+    }
+
+    // Next button
+    const nextLi = document.createElement('li');
+    const nextButton = document.createElement('a');
+    nextButton.href = '#';
+    nextButton.className = `inline-flex items-center justify-center w-10 h-10 rounded-full font-semibold ${currentPage === totalPages ? 'text-gray-400 bg-gray-100 cursor-not-allowed' : 'text-brand-dark bg-white hover:bg-brand-accent'}`;
+    nextButton.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>`;
+    nextButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (currentPage < totalPages) {
+            fetchAndRenderFilteredBreeds(currentPage + 1);
+        }
+    });
+    nextLi.appendChild(nextButton);
+    ul.appendChild(nextLi);
+
+    paginationContainer.appendChild(ul);
 }
