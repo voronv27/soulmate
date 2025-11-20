@@ -14,7 +14,10 @@ fetch(`https://api.geoapify.com/v1/ipinfo?apiKey=${apiKey}`).then(result => resu
 
 // Add map tiles layer. Set 20 as the maximal zoom and provide map data attribution.
 L.tileLayer(mapURL, {
-  attribution: 'Powered by <a href="https://www.geoapify.com/" target="_blank">Geoapify</a> | <a href="https://openmaptiles.org/" rel="nofollow" target="_blank">© OpenMapTiles</a> <a href="https://www.openstreetmap.org/copyright" rel="nofollow" target="_blank">© OpenStreetMap</a> contributors',
+  attribution:
+     'Powered by <a href="https://www.geoapify.com/" target="_blank">Geoapify</a> | ' +
+     '<a href="https://openmaptiles.org/" rel="nofollow" target="_blank">© OpenMapTiles</a> ' +
+     '<a href="https://www.openstreetmap.org/copyright" rel="nofollow" target="_blank">© OpenStreetMap</a> contributors',
   apiKey: apiKey,
   mapStyle: "osm-bright-smooth", // More map styles on https://apidocs.geoapify.com/docs/maps/map-tiles/
   maxZoom: 20
@@ -22,6 +25,20 @@ L.tileLayer(mapURL, {
 
 // Add in a layer for markers (points on the map)
 let markersLayer = L.layerGroup().addTo(map);
+
+// Custom star marker icon for shelters
+const star = L.divIcon({
+  className: "star-marker",
+  html: `
+    <svg viewBox="0 0 24 24" width="28" height="28" fill="#F4E8B8" stroke="#304A47" stroke-width="2" stroke-linejoin="round">
+      <path d="M12 2.5l3.1 6.4 7.1 1-5.2 5.1 1.2 7.1-6.2-3.3-6.2 3.3 1.2-7.1-5.2-5.1 7.1-1z"/>
+    </svg>
+  `,
+  iconSize: [28, 28],
+  iconAnchor: [14, 14],
+  popupAnchor: [0, -14]
+});
+
 
 // ---------------- SEARCH AND DISPLAY RESULTS ----------------
 // Geocode an address (get coordinates given an address). We need this to display markers on the map
@@ -35,13 +52,43 @@ async function geocodeAddress(address) {
 // Function to search for nearby pet-related* places
 // (*may swap to another API to have better search criteria)
 async function getShelters(lat, lon, radius) {
-  // This version of the link uses the search radius, but as Geoapify
-  // doesn't provide many results, we ignore the radius for testing
-  // const url = `https://api.geoapify.com/v2/places?categories=pet&bias=proximity:${lon},${lat}&filter=circle:${lon},${lat},${radius}&limit=50&apiKey=${apiKey}`;
-  const url = `https://api.geoapify.com/v2/places?categories=pet&bias=proximity:${lon},${lat}&limit=50&apiKey=${apiKey}`;
-  const response = await fetch(url);
+  // Make a query to Overpass for animal shelters within the search radius
+  const query = `
+     [out:json][timeout:25];
+    (
+      node(around:${radius},${lat},${lon})[amenity=animal_shelter];
+      way(around:${radius},${lat},${lon})[amenity=animal_shelter];
+      relation(around:${radius},${lat},${lon})[amenity=animal_shelter];
+      node(around:${radius},${lat},${lon})[office=animal_rescue];
+      way(around:${radius},${lat},${lon})[office=animal_rescue];
+      relation(around:${radius},${lat},${lon})[office=animal_rescue];
+    );
+    out center;`;
+  const url = "https://overpass-api.de/api/interpreter";
+  const response = await fetch(url, {
+    method: "POST",
+    body: query,
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+    }
+  });
+  if (!response.ok) {
+    alert("Error occurred while searching for shelters");
+    return [];
+  }
+
+  // Return lat, lon, and name for any shelter with
+  // a latitude and longitude (required to display on map)
   const data = await response.json();
-  return data.features;
+  return data.elements.map(
+    s => {
+      return {
+        lat: s.lat ?? s.center.lat,
+        lon: s.lon ?? s.center.lon,
+        name: s.tags.name || "Unnamed Shelter",
+      };
+    }
+  ).filter(s => s.lat && s.lon);
 }
 
 // Get user inputs (location and search radius) and search for local shelters, then
@@ -75,14 +122,34 @@ async function searchShelters() {
     alert("No shelters found in that area.");
     return;
   }
-  shelters.forEach(feature => {
-    const [lon, lat] = feature.geometry.coordinates;
-    const name = feature.properties.name || "Unnamed Shelter";
-    const address = feature.properties.formatted || "No address listed";
+  for (const s of shelters) {
+    const lon = s.lon;
+    const lat = s.lat;
+    const name = s.name;
+    var addr = "No address listed";
+    try {
+      // Try using geoapify to get the address with reverse geocoding
+      const revUrl = `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lon}&apiKey=${apiKey}`;
+      const revResp = await fetch(revUrl);
+      const revData = await revResp.json();
 
-    const marker = L.marker([lat, lon]).addTo(markersLayer);
-    marker.bindPopup(`<b>${name}</b><br>${address}`);
-  });
+      const rev = revData.features?.[0]?.properties;
+      if (rev?.formatted) {
+        addr = rev.formatted;
+      }
+    } catch (err) {
+      console.warn("Reverse geocode failed:", err);
+      continue;
+    }
+
+    const marker = L.marker([lat, lon], {icon: star}).addTo(markersLayer);
+    marker.bindPopup(`<b>${name}</b><br>${addr}<br>
+      <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(addr)}"
+        target="_blank"
+        style="text-decoration: underline;">
+        Get Directions
+      </a>`);
+  };
 }
 document.getElementById("mapSearchBtn").onclick = searchShelters;
 
