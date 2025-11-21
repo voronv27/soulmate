@@ -1,7 +1,7 @@
 const TOTAL_QUESTIONS = 15;
 const GENERAL_QUESTIONS_COUNT = 8;
-const CLEAR_MATCH_THRESHOLD = 5;
-const SUITABLE_THRESHOLD = 0;
+
+// Removed Threshold constants (CLEAR_MATCH_THRESHOLD, SUITABLE_THRESHOLD) 
 
 let userScores = {};
 let questionsAsked = new Set();
@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     setupMobileMenu();
-
     resetQuiz();
 });
 
@@ -73,7 +72,7 @@ function renderNextQuestion() {
     if (nextQuestionId) {
         renderQuestionById(nextQuestionId);
     } else {
-        console.warn("Ran out of questions or could not determine next question. Showing results early.");
+        console.log("Quiz finished or no suitable question found. Showing results.");
         showResults();
     }
 }
@@ -84,10 +83,8 @@ function findNextQuestionId() {
         if (questionBank[nextId] && !questionsAsked.has(nextId)) {
             lastAnsweredOption = null;
             return nextId;
-        } else {
-             if (!questionBank[nextId]) console.warn(`Branch target question "${nextId}" not found.`);
-             lastAnsweredOption = null;
         }
+        lastAnsweredOption = null;
     }
 
     lastAnsweredOption = null;
@@ -100,7 +97,6 @@ function findNextQuestionId() {
     if (coreQuestions.length > 0) {
         return coreQuestions[0];
     }
-
     const generalAnsweredCount = Array.from(questionsAsked).filter(id =>
         questionBank[id].tags.includes('general') &&
         !questionBank[id].tags.includes('follow-up')
@@ -117,8 +113,9 @@ function findNextQuestionId() {
         }
     }
 
+    let leadingPet = 'dog'; // Default
     let highestScore = -Infinity;
-    let leadingPet = 'dog';
+    
     for (const pet in userScores) {
         if (userScores[pet] > highestScore) {
             highestScore = userScores[pet];
@@ -142,20 +139,17 @@ function findNextQuestionId() {
         !questionsAsked.has(id)
     );
     if (fallbackQuestions.length > 0) {
-         console.log("Using fallback question selection.");
         return fallbackQuestions[Math.floor(Math.random() * fallbackQuestions.length)];
     }
 
     return null;
 }
 
-
 function renderQuestionById(id) {
     quizContainer.innerHTML = '';
     const question = questionBank[id];
 
     if (!question) {
-        console.error(`Question with ID "${id}" not found in questionBank.`);
         renderNextQuestion();
         return;
     }
@@ -211,7 +205,9 @@ function renderQuestionById(id) {
                     { border: 'border-green-600', ring: 'focus:ring-green-400' }
                 ];
                 const colorIndex = (option.value + 3);
-                ball.classList.add(colors[colorIndex].border, colors[colorIndex].ring);
+                if(colors[colorIndex]) {
+                    ball.classList.add(colors[colorIndex].border, colors[colorIndex].ring);
+                }
 
                 ball.onclick = () => handleAnswer(id, option);
                 optionsContainer.appendChild(ball);
@@ -235,15 +231,8 @@ function renderQuestionById(id) {
     }
 }
 
-
 function handleAnswer(id, option) {
     const score = option.score || {};
-    const isDealBreaker = option.isDealBreaker || false;
-
-    if (isDealBreaker) {
-        showResults('nonsuitable');
-        return;
-    }
 
     questionsAsked.add(id);
     totalAnswered++;
@@ -263,37 +252,25 @@ function handleAnswer(id, option) {
     }
 }
 
-
-function showResults(forcedResultKey = null) {
+function showResults() {
     document.getElementById('quiz-container').parentElement.style.display = 'none';
     progressBar.style.width = '100%';
     progressText.textContent = 'Results Calculated!';
 
-    let finalResultKey = '';
-
-    if (forcedResultKey) {
-        finalResultKey = forcedResultKey;
-    } else {
-        let bestMatchKey = 'dog';
-        let maxScore = -Infinity;
-
-        for (const pet in userScores) {
-            if (userScores[pet] > maxScore) {
-                maxScore = userScores[pet];
-                bestMatchKey = pet;
-            }
-        }
-
-        if (maxScore < SUITABLE_THRESHOLD) {
-            finalResultKey = 'nonsuitable';
-        } else if (maxScore < CLEAR_MATCH_THRESHOLD) {
-            finalResultKey = 'nomatch';
-        } else {
-            finalResultKey = bestMatchKey;
+    let bestMatchKey = 'dog';
+    let maxScore = -Infinity;
+    for (const pet in userScores) {
+        if (userScores[pet] > maxScore) {
+            maxScore = userScores[pet];
+            bestMatchKey = pet;
         }
     }
 
-    const profile = petProfiles[finalResultKey];
+    if (!petProfiles[bestMatchKey]) {
+        bestMatchKey = 'dog'; 
+    }
+
+    const profile = petProfiles[bestMatchKey];
 
     resultsContent.innerHTML = `
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden md:flex">
@@ -305,8 +282,15 @@ function showResults(forcedResultKey = null) {
                 <p class="text-lg text-brand-text leading-relaxed">
                     ${profile.description}
                 </p>
+                <div class="mt-6 p-4 bg-brand-light rounded-lg border border-brand-accent">
+                    <p class="text-sm font-semibold text-brand-dark mb-2">Why this match?</p>
+                    <p class="text-sm text-brand-text-light">
+                        Based on your lifestyle and preferences, the ${profile.title} scored highest compatibility! 
+                        (Score: ${maxScore})
+                    </p>
+                </div>
                 <p class="text-md text-brand-text-light mt-6">
-                    This is just a recommendation! Click the button below to find local shelters and see all types of animals that fit your criteria.
+                    Ready to meet your new best friend? Click below to find shelters near you.
                 </p>
             </div>
         </div>
