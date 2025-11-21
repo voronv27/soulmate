@@ -95,7 +95,13 @@ async function getShelters(lat, lon, radius) {
 // display them on the map
 async function searchShelters() {
   const address = document.getElementById("location").value;
-  const radiusMiles = parseFloat(document.getElementById("radius").value) || 20;
+  const radiusMiles = parseFloat(document.getElementById("radius").value) || -1;
+
+  if (radiusMiles <= 0) {
+    alert("Please enter a valid search radius which is > 0 miles");
+    return;
+  }
+
   // Geoapify needs radius to be in meters so we just convert it
   const radius = radiusMiles * 1609.34;
 
