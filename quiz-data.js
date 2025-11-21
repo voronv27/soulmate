@@ -12,23 +12,14 @@ const petProfiles = {
     smallAnimal: {
         title: "Small Animal (Rabbit/Hamster)",
         image: "https://images.unsplash.com/photo-1425082661705-1834bfd09d64?q=80&w=2070&auto.format&fit=crop",
-        description: "You are cautious, this might be your first pet, or you have limited space. A small animal like a rabbit, guinea pig, or hamster can be a wonderful companion. They teach responsibility and often require less space and attention than larger pets."
+        description: "You seem to prefer a gentler, contained companion or have limited space. A small animal like a rabbit, guinea pig, or hamster is a wonderful choice! They teach responsibility, are adorable to watch, and require less space than larger pets."
     },
     reptile: {
         title: "Reptile or Fish",
         image: "https://images.unsplash.com/photo-1507048331194-c34GG41a134c?q=80&w=1974&auto.format&fit=crop",
-        description: "You are a quiet observer, perhaps concerned about allergies or noise. A fish or reptile (like a gecko or bearded dragon) can be a fascinating, low-allergen presence. Their needs are unique but can be incredibly rewarding."
-    },
-    nomatch: {
-        title: "No Clear Match",
-        image: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=1964&auto.format&fit=crop",
-        description: "Your answers suggest that no single pet type stands out as the perfect match. This is common! Your lifestyle might be a great fit for several types of animals. We recommend you visit local shelters to meet various animals and see which one connects with you the most!"
-    },
-    nonsuitable: {
-        title: "No Suitable Pet Found",
-        image: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=1974&auto.format&fit=crop",
-        description: "Based on your responses, it seems that none of the common pet types would be a suitable match for your current lifestyle or living situation. This is okay! Pet ownership is a big commitment. You might consider waiting until circumstances change or exploring other ways to engage with animals, such as volunteering at a local shelter."
+        description: "You are a quiet observer, or perhaps you have allergies or a strict housing situation. A fish or reptile (like a gecko or bearded dragon) is your best match! They are fascinating, low-allergen, and noise-free companions that are rewarding to care for."
     }
+    // Removed: 'nomatch' and 'nonsuitable'
 };
 
 const questionBank = {
@@ -37,10 +28,11 @@ const questionBank = {
         type: "multipleChoice",
         tags: ['core', 'home'],
         options: [
-            { text: "No pets are allowed at all", score: {}, isDealBreaker: true },
+            // Changed Dealbreaker to heavy bias towards reptile/small animal (easier to hide/negotiate)
+            { text: "No pets are allowed at all", score: { dog: -10, cat: -10, smallAnimal: 2, reptile: 5 } },
             {
                 text: "Some pets are allowed (with restrictions)",
-                score: { dog: -2, cat: 1, smallAnimal: 1, reptile: 1 },
+                score: { dog: -2, cat: 1, smallAnimal: 2, reptile: 2 },
                 nextQuestion: 'q_housing_restrictions'
             },
             { text: "All pets are welcome!", score: { dog: 2, cat: 1, smallAnimal: 1, reptile: 1 } }
@@ -51,9 +43,9 @@ const questionBank = {
         type: "multipleChoice",
         tags: ['follow-up', 'home'],
         options: [
-            { text: "Weight limits only", score: { dog: -1 } },
-            { text: "Breed restrictions", score: { dog: -1 } },
-            { text: "Only cats/small animals allowed", score: { dog: -3, cat: 1, smallAnimal: 1 } },
+            { text: "Weight limits only", score: { dog: -1, cat: 1 } },
+            { text: "Breed restrictions", score: { dog: -1, cat: 1 } },
+            { text: "Only cats/small animals allowed", score: { dog: -10, cat: 2, smallAnimal: 2 } },
             { text: "Unsure, I need to check", score: {} }
         ],
         nextQuestion: null
@@ -64,102 +56,114 @@ const questionBank = {
         tags: ['core', 'home'],
         options: [
             { text: "No", score: { dog: 1, cat: 1, smallAnimal: 1 } },
-            { text: "Yes", score: { dog: -5, cat: -5, smallAnimal: -3, reptile: 5 } }
+            // Heavy penalty for fur, massive boost for reptiles
+            { text: "Yes", score: { dog: -8, cat: -8, smallAnimal: -3, reptile: 8 } }
         ]
     },
      'dq_allergy_hh': {
-        text: "Do you or anyone in your household have a known *severe* allergy to animal fur, dander, or saliva that cannot be managed?",
+        text: "Do you or anyone in your household have a known *severe* allergy to animal fur, dander, or saliva?",
         type: "yesNo",
         tags: ['core', 'home'],
         options: [
             { text: "No", score: {} },
-            { text: "Yes", score: {}, isDealBreaker: true }
+            // Previously a dealbreaker, now forces a Reptile match
+            { text: "Yes", score: { dog: -10, cat: -10, smallAnimal: -5, reptile: 10 } }
         ]
     },
      'dq_housing_prohibit': {
-        text: "Does your current living situation *explicitly prohibit* pets?",
+        text: "Does your current living situation *explicitly prohibit* dogs and cats?",
         type: "yesNo",
         tags: ['core', 'home'],
         options: [
             { text: "No", score: {} },
-            { text: "Yes", score: {}, isDealBreaker: true }
+            // Previously dealbreaker. Now pushes small animals/reptiles.
+            { text: "Yes", score: { dog: -10, cat: -10, smallAnimal: 3, reptile: 5 } }
         ]
     },
     'dq_commitment_time': {
-        text: "Are you unable to commit to caring for a pet for the next 10-15 years, even through potential life changes?",
+        text: "Are you concerned about committing to a pet for 10-15 years?",
         type: "yesNo",
         tags: ['core', 'lifestyle'],
         options: [
-            { text: "No, I am prepared for a long-term commitment", score: { dog: 1, cat: 1, smallAnimal: 1} },
-            { text: "Yes, I cannot make that commitment", score: {}, isDealBreaker: true }
+            { text: "No, I am prepared for a long-term commitment", score: { dog: 2, cat: 2 } },
+            // If they can't commit long term, suggest small animals (shorter lifespans generally)
+            { text: "Yes, I prefer a shorter commitment", score: { dog: -5, cat: -3, smallAnimal: 4, reptile: 0 } }
         ]
     },
     'dq_commitment_cost': {
-        text: "Are you unprepared for the extra expenses of pet ownership, including potential emergency vet bills?",
+        text: "Are you worried about high veterinary expenses?",
         type: "yesNo",
         tags: ['core', 'cost'],
         options: [
-            { text: "No, I am financially prepared", score: { dog: 1, cat: 1, smallAnimal: 1, reptile: 1 } },
-            { text: "Yes, I am unprepared for these costs", score: {}, isDealBreaker: true }
+            { text: "No, I am financially prepared", score: { dog: 1, cat: 1 } },
+            // If broke, discourage dog/cat, encourage small animal/reptile
+            { text: "Yes, keeping costs low is priority", score: { dog: -5, cat: -2, smallAnimal: 3, reptile: 2 } }
         ]
     },
     'dq_time_away': {
-        text: "Will the pet be left alone for more than 10 hours a day regularly, with no one else at home?",
+        text: "Will the pet be left alone for more than 10 hours a day regularly?",
         type: "yesNo",
         tags: ['core', 'lifestyle'],
         options: [
-            { text: "No", score: { dog: 1, cat: 1, smallAnimal: 1, reptile: 1 } },
-            { text: "Yes", score: { dog: -3, cat: -1 }, isDealBreaker: true }
+            { text: "No", score: { dog: 1, cat: 1 } },
+            // Dogs hate this. Cats tolerate it better. Reptiles don't care.
+            { text: "Yes", score: { dog: -8, cat: 0, smallAnimal: 1, reptile: 5 } }
         ]
     },
      'dq_cleanliness': {
-        text: "Are you unable to tolerate pet hair, occasional accidents (urine/feces), or general pet mess?",
+        text: "How much do you dislike pet hair or mess?",
         type: "yesNo",
         tags: ['core', 'lifestyle'],
         options: [
-            { text: "No, I can handle it", score: { dog: 1, cat: 1, smallAnimal: 1 } },
-            { text: "Yes, I cannot tolerate mess", score: { dog: -3, cat: -3, smallAnimal: -2, reptile: 3 }, isDealBreaker: true }
+            { text: "I can handle it", score: { dog: 1, cat: 1, smallAnimal: 1 } },
+            // If they hate mess, suggest Reptile (contained)
+            { text: "I strictly cannot tolerate mess", score: { dog: -5, cat: -5, smallAnimal: -2, reptile: 5 } }
         ]
     },
      'dq_patience': {
-        text: "Do you lack the patience for long-term training or dealing with potential behavioral issues (barking, scratching)?",
+        text: "Do you have patience for training and potential behavioral issues?",
         type: "yesNo",
         tags: ['core', 'experience'],
         options: [
-            { text: "No, I have patience", score: { dog: 2, cat: 1 } },
-            { text: "Yes, I lack patience", score: { dog: -3 }, isDealBreaker: true }
+            { text: "Yes, I have patience", score: { dog: 3, cat: 1 } },
+            // No patience = No dog.
+            { text: "No, I prefer an easy-going pet", score: { dog: -5, cat: 1, smallAnimal: 2, reptile: 2 } }
         ]
     },
     'dq_move_soon': {
-        text: "Are you planning to move frequently or move abroad within the next one or two years?",
+        text: "Are you planning to move frequently in the near future?",
         type: "yesNo",
         tags: ['core', 'lifestyle'],
         options: [
-            { text: "No", score: {} },
-            { text: "Yes", score: { dog: -1, cat: -1, smallAnimal: -1, reptile: -1 }, isDealBreaker: true }
+            { text: "No", score: { dog: 1, cat: 1 } },
+            // Moving is hard with big pets.
+            { text: "Yes", score: { dog: -3, cat: -2, smallAnimal: 1, reptile: 2 } }
         ]
     },
     'dq_motivation': {
-        text: "Is your primary motivation for getting a pet based on a whim, without thorough research?",
+        text: "Have you done research on pet ownership?",
         type: "yesNo",
         tags: ['core', 'experience'],
         options: [
-            { text: "No, I've done my research", score: { dog: 1, cat: 1, smallAnimal: 1, reptile: 1 } },
-            { text: "Yes, it was kind of sudden", score: { dog: -1, cat: -1, smallAnimal: -1, reptile: -1 }, isDealBreaker: true }
+            { text: "Yes, I've done my research", score: { dog: 1, cat: 1, smallAnimal: 1, reptile: 1 } },
+            { text: "No, I'm just exploring the idea", score: { dog: -2, cat: 0, smallAnimal: 2, reptile: 2 } }
         ]
     },
     'dq_daily_care': {
-        text: "Are you unwilling to spend time *every day* on essential pet care (walks, cleaning, interaction)?",
+        text: "Can you spend time *every day* on interactive care (walking/playing)?",
         type: "yesNo",
         tags: ['core', 'lifestyle'],
         options: [
-            { text: "No, I am willing", score: { dog: 2, cat: 1, smallAnimal: 1 } },
-            { text: "Yes, I am unwilling", score: { dog: -5, cat: -3, smallAnimal: -2, reptile: -1 }, isDealBreaker: true }
+            { text: "Yes, I am willing", score: { dog: 3, cat: 1 } },
+            // If unwilling to interact daily, Dog is out. Reptile/Fish is in.
+            { text: "No, I prefer low interaction", score: { dog: -8, cat: -3, smallAnimal: 1, reptile: 5 } }
         ]
     },
 
+    // --- GENERAL QUESTIONS (Unchanged mostly, just ensuring logic is sound) ---
+
     'dq_mt_home_hours': {
-        text: "How many hours a day are you typically *away* from home (work/school)?",
+        text: "How many hours a day are you typically *away* from home?",
         type: "multipleChoice",
         tags: ['general', 'lifestyle'],
         options: [
@@ -188,7 +192,6 @@ const questionBank = {
             { text: "I enjoy lively, active environments", score: { dog: 2, cat: 0, smallAnimal: -1, reptile: -1 } }
         ]
     },
-
     'shunt_perfect_day': {
         text: "When you imagine a perfect day with a pet, what is the most central part?",
         type: "multipleChoice",
