@@ -89,25 +89,28 @@
         </div>
     </header>
     
-    <main class="pt-[72px]">
-        <div class="hero-image-container">
-            <div class="hero-image-bg">
-                <div id="map"></div>
-            </div>
-        </div>
+    <main class="pt-[100px]">
 
-        <div id="inputFields" class="bg-white rounded-2xl p-8">
-            <p>Location to center search around:</p>
-            <input type="text" id="location" placeholder="Enter your location" class="flex-1 py-2 px-4 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-dark placeholder-gray-400">
-            <br>
-            <div id="suggestionBox"></div>
-            <br>
-            <p>Maximum distance from search location (miles):</p>
-            <input type="text" id="radius" placeholder="Enter search radius" class="flex-1 py-2 px-4 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-dark placeholder-gray-400">
-            <br><br>
-            <button id="mapSearchBtn" class="bg-brand-dark text-white rounded px-4 py-2 hover:bg-brand-dark-hover">
-                Search
-            </button>            
+        <div class="max-w-8xl mx-auto px-6 flex flex-col lg:flex-row gap-6">
+            <div class="hero-image-container">
+                <div id="map" class="flex-1 rounded-xl overflow-hidden"></div>
+            </div>
+
+            <div id="inputFields" class="flex-1 bg-white rounded-2xl p-8 shadow">
+                <p>Location to center search around:</p>
+                <input type="text" autocomplete="off" id="location" placeholder="Enter your location" class="flex-1 py-2 px-4 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-dark placeholder-gray-400">
+                <br>
+                <div class="relative">
+                    <div id="suggestionBox"></div>
+                </div>
+                <br>
+                <p>Maximum distance from search location (miles):</p>
+                <input type="text" id="radius" placeholder="Enter search radius" class="flex-1 py-2 px-4 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-dark placeholder-gray-400">
+                <br><br>
+                <button id="mapSearchBtn" class="bg-brand-dark text-white rounded px-4 py-2 hover:bg-brand-dark-hover">
+                    Search
+                </button>            
+            </div>
         </div>
     </main>
 </body>

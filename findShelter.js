@@ -74,7 +74,7 @@ async function getShelters(lat, lon, radius) {
   });
   if (!response.ok) {
     alert("Error occurred while searching for shelters");
-    return [];
+    return null;
   }
 
   // Return lat, lon, and name for any shelter with
@@ -102,7 +102,7 @@ async function searchShelters() {
     return;
   }
 
-  // Geoapify needs radius to be in meters so we just convert it
+  // Overpass needs radius to be in meters so we just convert it
   const radius = radiusMiles * 1609.34;
 
   if (!address) {
@@ -124,6 +124,12 @@ async function searchShelters() {
 
   // Either message that there are no nearby shelters or display them on the map
   const shelters = await getShelters(lat, lon, radius);
+
+  if (!shelters) {
+    // There was an error in getShelters, return early
+    return;
+  }
+
   if (!shelters.length) {
     alert("No shelters found in that area.");
     return;
@@ -192,10 +198,7 @@ async function updateAddressSuggestions() {
   // Display each suggested address
   latestSuggestions.forEach(s => {
     const div = document.createElement("div");
-    div.classList.add("js-animate-on-scroll", "bg-brand-light",
-      "rounded-2xl", "p-8", "transition-all", "duration-300",
-      "hover:-translate-y-2", "hover:shadow-xl", "fade-in-element",
-      "is-visible");
+    div.classList.add("suggestion-item");
     div.textContent = s.properties.formatted;
 
     // Clicking on an address suggestion changes the inputBox text
