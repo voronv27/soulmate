@@ -1,7 +1,7 @@
 const petProfiles = {
     dog: {
         title: "Dog",
-        image: "https://api.builder.io/api/v1/image/assets/TEMP/26a22521674d0dad462b6d5cdc11f1f4202094d7?width=1232",
+        image: "https://images.unsplash.com/photo-1518717758536-85ae29035b6d?q=80&w=2070&auto.format&fit=crop",
         description: "You are an active person who desires companionship. A dog would be your loyal partner, perfect for walks, play, and becoming a loving member of the family. They require time for training and exercise, which you seem happy to provide!"
     },
     cat: {
@@ -11,12 +11,12 @@ const petProfiles = {
     },
     smallAnimal: {
         title: "Small Animal (Rabbit/Hamster)",
-        image: "https://images.unsplash.com/photo-1425082661705-1834bfd09d64?q=80&w=2070&auto.format&fit=crop",
+        image: "https://images.unsplash.com/photo-1584553421349-3557471bed79?q=80&w=2046&q=80&w=2070&auto.format&fit=crop",
         description: "You seem to prefer a gentler, contained companion or have limited space. A small animal like a rabbit, guinea pig, or hamster is a wonderful choice! They teach responsibility, are adorable to watch, and require less space than larger pets."
     },
     reptile: {
         title: "Reptile or Fish",
-        image: "https://images.unsplash.com/photo-1507048331194-c34GG41a134c?q=80&w=1974&auto.format&fit=crop",
+        image: "https://images.unsplash.com/photo-1605047632156-a30df37facab?q=80&w=1974&auto.format&fit=crop",
         description: "You are a quiet observer, or perhaps you have allergies or a strict housing situation. A fish or reptile (like a gecko or bearded dragon) is your best match! They are fascinating, low-allergen, and noise-free companions that are rewarding to care for."
     }
     // Removed: 'nomatch' and 'nonsuitable'
