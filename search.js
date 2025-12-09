@@ -1,6 +1,5 @@
 /**
  * API Keys for TheDogAPI and TheCatAPI.
- * Please replace 'YOUR_THEDOGAPI_KEY' and 'YOUR_THECATAPI_KEY' with your actual keys.
  */
 const DOG_API_KEY = 'live_MDVz1JPcd96dyCiBhfMyOlDkZ0Wi3rPm8Ry6nytOoyjX8gToNkHIC9MUMwxduiVa';
 const CAT_API_KEY = 'live_V6UfZeNGHVHQbhWynCTJDWa3HwsbyYBzdAsx23Ep9iQMR1ehy7TL7dHJCS9lmei6';
@@ -116,17 +115,28 @@ async function fetchAllBreedsAndRender() {
     resultsCount.textContent = 'Loading results...';
 
     try {
-        const dogBreedsPromise = fetch('https://api.thedogapi.com/v1/breeds', {
-            headers: { 'x-api-key': DOG_API_KEY }
-        }).then(res => res.json());
+        // Helper function to fetch breeds safely
+        const fetchBreeds = async (url, apiKey) => {
+            try {
+                const response = await fetch(url, { headers: { 'x-api-key': apiKey } });
+                if (!response.ok) {
+                    console.error(`API Error: ${response.status} ${response.statusText} for ${url}`);
+                    return [];
+                }
+                return await response.json();
+            } catch (error) {
+                console.error(`Fetch Error for ${url}:`, error);
+                return [];
+            }
+        };
 
-        const catBreedsPromise = fetch('https://api.thecatapi.com/v1/breeds', {
-            headers: { 'x-api-key': CAT_API_KEY }
-        }).then(res => res.json());
+        // Fetch both concurrently, but failures won't reject the main promise
+        const [dogData, catData] = await Promise.all([
+            fetchBreeds('https://api.thedogapi.com/v1/breeds', DOG_API_KEY),
+            fetchBreeds('https://api.thecatapi.com/v1/breeds', CAT_API_KEY)
+        ]);
 
-        const [dogData, catData] = await Promise.all([dogBreedsPromise, catBreedsPromise]);
-
-        const mappedDogBreeds = dogData.map(breed => ({
+        const mappedDogBreeds = Array.isArray(dogData) ? dogData.map(breed => ({
             id: `dog-${breed.id}`,
             name: breed.name,
             type: 'Dog',
@@ -140,9 +150,9 @@ async function fetchAllBreedsAndRender() {
             child_friendly: breed.child_friendly || 0, // 1-5 scale
             dog_friendly: breed.dog_friendly || 0,   // 1-5 scale
             shedding_level: breed.shedding_level || 0 // 1-5 scale
-        }));
+        })) : [];
 
-        const mappedCatBreeds = catData.map(breed => ({
+        const mappedCatBreeds = Array.isArray(catData) ? catData.map(breed => ({
             id: `cat-${breed.id}`,
             name: breed.name,
             type: 'Cat',
@@ -156,12 +166,18 @@ async function fetchAllBreedsAndRender() {
             child_friendly: breed.child_friendly || 0, // 1-5 scale
             dog_friendly: breed.dog_friendly || 0,   // 1-5 scale
             shedding_level: breed.shedding_level || 0 // 1-5 scale
-        }));
+        })) : [];
 
         allBreeds = [...mappedDogBreeds, ...mappedCatBreeds];
+        
+        if (allBreeds.length === 0) {
+             throw new Error('No breeds loaded from either API.');
+        }
+
         console.log('All breeds fetched:', allBreeds);
 
-        fetchAndRenderFilteredBreeds(1); // Render initial filtered results
+        // Reset to page 1 and render
+        fetchAndRenderFilteredBreeds(1); 
 
     } catch (error) {
         console.error('Failed to fetch all breeds:', error);
