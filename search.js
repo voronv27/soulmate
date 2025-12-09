@@ -3,7 +3,7 @@
  * Please replace 'YOUR_THEDOGAPI_KEY' and 'YOUR_THECATAPI_KEY' with your actual keys.
  */
 const DOG_API_KEY = 'live_MDVz1JPcd96dyCiBhfMyOlDkZ0Wi3rPm8Ry6nytOoyjX8gToNkHIC9MUMwxduiVa';
-const CAT_API_KEY = 'live_V6UfZeNGHVHQbhWynCTJDWa3HwsbyYBzdAsx23Ep9iQMR1ehy7TL7dHJCS9lmei6';
+const CAT_API_KEY = 'live_eSSl0NRUbLiAGq9V39ZgRMcowTENAR89m1L0g3BVwIxbdxBj0rZiroyTgWLenlBc';
 
 let allBreeds = []; // Stores all fetched breeds for client-side filtering
 let currentPage = 1;
