@@ -1,20 +1,22 @@
 <!-- HTML page for shelter search feature -->
 <!DOCTYPE html>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find Shelters - Soulmate</title>
-    
+
     <!-- Leaflet CSS and JS for map--CSS should be imported before the JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-     crossorigin=""></script>
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <!-- Geoapify for address search -->
-    <link rel="stylesheet" href="https://unpkg.com/@geoapify/leaflet-address-search-plugin@^1/dist/L.Control.GeoapifyAddressSearch.min.css" />
-    <script src="https://unpkg.com/@geoapify/leaflet-address-search-plugin@^1/dist/L.Control.GeoapifyAddressSearch.min.js"></script>
+    <link rel="stylesheet"
+        href="https://unpkg.com/@geoapify/leaflet-address-search-plugin@^1/dist/L.Control.GeoapifyAddressSearch.min.css" />
+    <script
+        src="https://unpkg.com/@geoapify/leaflet-address-search-plugin@^1/dist/L.Control.GeoapifyAddressSearch.min.js"></script>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -52,24 +54,36 @@
     <script src="findShelter.js" type="module" defer></script>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body class="font-poppins leading-relaxed text-brand-dark bg-brand-light">
     <!-- Header -->
-    <header id="page-header" class="bg-white shadow-sm fixed top-0 left-0 right-0 z-50 h-[72px] transition-colors duration-300">
+    <header id="page-header"
+        class="bg-white shadow-sm fixed top-0 left-0 right-0 z-50 h-[72px] transition-colors duration-300">
         <div class="max-w-8xl mx-auto px-6">
             <div class="flex items-center justify-between h-[72px]">
                 <a href="index.html" class="flex items-center gap-3">
                     <div class="logo-container">
-                        <img src="assets/Soulmate_recolor.png" alt="Soulmate Logo" style="width: 350px; height: 200px; ">
+                        <img src="assets/Soulmate_recolor.png" alt="Soulmate Logo"
+                            style="width: 350px; height: 200px; ">
                     </div>
                 </a>
                 <nav class="hidden lg:flex items-center gap-8">
-                    <a href="index.html#how-it-works" class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">How It Works</a>
-                    <a href="search.html" class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">Search Breeds</a>
-                    <a href="findShelter.html" class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">Find Shelters</a>
-                    <a href="index.html#contact" class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">Contact</a>
+                    <a href="index.html#how-it-works"
+                        class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">How It
+                        Works</a>
+                    <a href="search.html"
+                        class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">Search
+                        Breeds</a>
+                    <a href="findShelter.html"
+                        class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">Find
+                        Shelters</a>
+                    <a href="index.html#contact"
+                        class="text-brand-dark no-underline text-base font-normal leading-6 hover:opacity-80">Contact</a>
                 </nav>
                 <div class="flex items-center gap-4">
-                    <a href="index.html" class="hidden sm:inline-block bg-brand-accent hover:bg-brand-accent-hover rounded-full py-2 px-6 text-brand-dark font-medium no-underline transition-transform hover:-translate-y-0.5">Back to Home</a>
+                    <a href="index.html"
+                        class="hidden sm:inline-block bg-brand-accent hover:bg-brand-accent-hover rounded-full py-2 px-6 text-brand-dark font-medium no-underline transition-transform hover:-translate-y-0.5">Back
+                        to Home</a>
                     <!-- Mobile Menu Button -->
                     <button id="mobile-menu-btn" class="lg:hidden text-brand-dark text-3xl z-20">
                         ☰
@@ -80,38 +94,116 @@
         <!-- Mobile Menu Panel -->
         <div id="mobile-menu" class="hidden lg:hidden absolute top-0 left-0 right-0 bg-white shadow-lg pt-[72px]">
             <nav class="flex flex-col p-4 gap-4">
-                <a href="index.html#how-it-works" class="text-brand-dark no-underline p-2 rounded hover:bg-gray-100">How It Works</a>
-                <a href="search.html" class="text-brand-dark no-underline p-2 rounded hover:bg-gray-100">Search Breeds</a>
-                <a href="findShelter.html" class="text-brand-dark no-underline p-2 rounded hover:bg-gray-100">Find Shelters</a>
-                <a href="index.html#contact" class="text-brand-dark no-underline p-2 rounded hover:bg-gray-100">Contact</a>
-                <a href="index.html" class="mt-2 sm:hidden bg-brand-accent hover:bg-brand-accent-hover rounded-full py-2 px-6 text-brand-dark font-medium no-underline text-center">Back to Home</a>
+                <a href="index.html#how-it-works" class="text-brand-dark no-underline p-2 rounded hover:bg-gray-100">How
+                    It Works</a>
+                <a href="search.html" class="text-brand-dark no-underline p-2 rounded hover:bg-gray-100">Search
+                    Breeds</a>
+                <a href="findShelter.html" class="text-brand-dark no-underline p-2 rounded hover:bg-gray-100">Find
+                    Shelters</a>
+                <a href="index.html#contact"
+                    class="text-brand-dark no-underline p-2 rounded hover:bg-gray-100">Contact</a>
+                <a href="index.html"
+                    class="mt-2 sm:hidden bg-brand-accent hover:bg-brand-accent-hover rounded-full py-2 px-6 text-brand-dark font-medium no-underline text-center">Back
+                    to Home</a>
             </nav>
         </div>
     </header>
-    
+
     <main class="pt-[100px]">
 
-        <div class="max-w-8xl mx-auto px-6 flex flex-col lg:flex-row gap-6">
+        <div class="max-w-8xl mx-auto px-6 flex flex-col lg:flex-row gap-6 mb-24">
             <div class="hero-image-container">
-                <div id="map" class="flex-1 rounded-xl overflow-hidden"></div>
+                <div id="map" class="flex-1 rounded-xl overflow-hidden border-2 border-gray-200 shadow-sm"></div>
             </div>
 
             <div id="inputFields" class="flex-1 bg-white rounded-2xl p-8 shadow">
                 <p>Location to center search around:</p>
-                <input type="text" autocomplete="off" id="location" placeholder="Enter your location" class="flex-1 py-2 px-4 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-dark placeholder-gray-400">
+                <input type="text" autocomplete="off" id="location" placeholder="Enter your location"
+                    class="flex-1 py-2 px-4 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-dark placeholder-gray-400">
                 <br>
                 <div class="relative">
                     <div id="suggestionBox"></div>
                 </div>
                 <br>
                 <p>Maximum distance from search location (miles):</p>
-                <input type="text" id="radius" placeholder="Enter search radius" class="flex-1 py-2 px-4 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-dark placeholder-gray-400">
+                <input type="text" id="radius" placeholder="Enter search radius"
+                    class="flex-1 py-2 px-4 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-dark placeholder-gray-400">
                 <br><br>
                 <button id="mapSearchBtn" class="bg-brand-dark text-white rounded px-4 py-2 hover:bg-brand-dark-hover">
                     Search
-                </button>            
+                </button>
             </div>
         </div>
     </main>
+
+    <footer class="bg-white pt-16 pb-8 border-t border-gray-200">
+        <div class="max-w-8xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <!-- Brand Info -->
+                <div class="flex flex-col gap-6">
+                    <a href="index.html" class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-brand-dark flex items-center justify-center p-2"><svg
+                                width="18" height="18" viewBox="0 0 18 19" fill="white"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M1.67344 10.8105L8.02617 16.7414C8.28984 16.9875 8.63789 17.1246 9 17.1246C9.36211 17.1246 9.71016 16.9875 9.97383 16.7414L16.3266 10.8105C17.3953 9.81559 18 8.41989 18 6.96091V6.757C18 4.29958 16.2246 2.20427 13.8023 1.79997C12.1992 1.53278 10.568 2.05661 9.42188 3.2027L9 3.62458L8.57812 3.2027C7.43203 2.05661 5.80078 1.53278 4.19766 1.79997C1.77539 2.20427 0 4.29958 0 6.757V6.96091C0 8.41989 0.604687 9.81559 1.67344 10.8105Z" />
+                            </svg></div>
+                        <span class="text-2xl font-bold text-brand-dark leading-8">Soulmate</span>
+                    </a>
+                    <p class="text-base text-brand-text-light">Connecting hearts with paws through intelligent pet
+                        matching and local shelter partnerships.</p>
+                    <div class="flex gap-4">
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-brand-light flex items-center justify-center transition-transform hover:-translate-y-1"><svg
+                                width="16" height="16" viewBox="0 0 16 16" fill="#304A47"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M15.75 8C15.75 3.71875 12.2812 0.25 8 0.25C3.71875 0.25 0.25 3.71875 0.25 8C0.25 11.8681 3.08406 15.0744 6.78906 15.6562V10.2403H4.82031V8H6.78906V6.2925C6.78906 4.35031 7.94531 3.2775 9.71625 3.2775C10.5644 3.2775 11.4513 3.42875 11.4513 3.42875V5.335H10.4738C9.51125 5.335 9.21094 5.9325 9.21094 6.54531V8H11.3603L11.0166 10.2403H9.21094V15.6562C12.9159 15.0744 15.75 11.8681 15.75 8Z" />
+                            </svg></a>
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-brand-light flex items-center justify-center transition-transform hover:-translate-y-1"><svg
+                                width="14" height="16" viewBox="0 0 14 16" fill="#304A47"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M7.00312 4.40586C5.01562 4.40586 3.41249 6.00898 3.41249 7.99648C3.41249 9.98398 5.01562 11.5871 7.00312 11.5871C8.99062 11.5871 10.5937 9.98398 10.5937 7.99648C10.5937 6.00898 8.99062 4.40586 7.00312 4.40586ZM7.00312 10.3309C5.71874 10.3309 4.66874 9.28398 4.66874 7.99648C4.66874 6.70898 5.71562 5.66211 7.00312 5.66211C8.29062 5.66211 9.33749 6.70898 9.33749 7.99648C9.33749 9.28398 8.28749 10.3309 7.00312 10.3309ZM11.5781 4.25898C11.5781 4.72461 11.2031 5.09648 10.7406 5.09648C10.275 5.09648 9.90312 4.72148 9.90312 4.25898C9.90312 3.79648 10.2781 3.42148 10.7406 3.42148C11.2031 3.42148 11.5781 3.79648 11.5781 4.25898ZM13.9562 5.10898C13.9031 3.98711 13.6469 2.99336 12.825 2.17461C12.0062 1.35586 11.0125 1.09961 9.89062 1.04336C8.73437 0.977734 5.26874 0.977734 4.11249 1.04336C2.99374 1.09648 1.99999 1.35273 1.17812 2.17148C0.356244 2.99023 0.103119 3.98398 0.0468689 5.10586C-0.0187561 6.26211 -0.0187561 9.72773 0.0468689 10.884C0.0999939 12.0059 0.356244 12.9996 1.17812 13.8184C1.99999 14.6371 2.99062 14.8934 4.11249 14.9496C5.26874 15.0152 8.73437 15.0152 9.89062 14.9496C11.0125 14.8965 12.0062 14.6402 12.825 13.8184C13.6437 12.9996 13.9 12.0059 13.9562 10.884C14.0219 9.72773 14.0219 6.26523 13.9562 5.10898ZM12.4625 12.1246C12.2187 12.7371 11.7469 13.209 11.1312 13.4559C10.2094 13.8215 8.02187 13.7371 7.00312 13.7371C5.98437 13.7371 3.79374 13.8184 2.87499 13.4559C2.26249 13.2121 1.79062 12.7402 1.54374 12.1246C1.17812 11.2027 1.26249 9.01523 1.26249 7.99648C1.26249 6.97773 1.18124 4.78711 1.54374 3.86836C1.78749 3.25586 2.25937 2.78398 2.87499 2.53711C3.79687 2.17148 5.98437 2.25586 7.00312 2.25586C8.02187 2.25586 10.2125 2.17461 11.1312 2.53711C11.7437 2.78086 12.2156 3.25273 12.4625 3.86836C12.8281 4.79023 12.7437 6.97773 12.7437 7.99648C12.7437 9.01523 12.8281 11.2059 12.4625 12.1246Z" />
+                            </svg></a>
+                    </div>
+                </div>
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-lg font-bold text-brand-dark mb-4">Quick Links</h3>
+                    <ul class="flex flex-col gap-2">
+                        <li><a href="quiz.html" class="text-brand-text-light hover:text-brand-dark no-underline">Take
+                                Quiz</a></li>
+                        <li><a href="index.html#how-it-works"
+                                class="text-brand-text-light hover:text-brand-dark no-underline">How It Works</a></li>
+                        <li><a href="findShelter.html"
+                                class="text-brand-text-light hover:text-brand-dark no-underline">Find Shelters</a></li>
+                    </ul>
+                </div>
+                <!-- Support Links -->
+                <div>
+                    <h3 class="text-lg font-bold text-brand-dark mb-4">Support</h3>
+                    <ul class="flex flex-col gap-2">
+                        <li><a href="#help" class="text-brand-text-light hover:text-brand-dark no-underline">Help
+                                Center</a></li>
+                        <li><a href="index.html#contact"
+                                class="text-brand-text-light hover:text-brand-dark no-underline">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div
+                class="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+                <p class="text-sm text-brand-text-light">© 2024 Soulmate. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a href="#privacy" class="text-sm text-brand-text-light hover:text-brand-dark no-underline">Privacy
+                        Policy</a>
+                    <a href="#terms" class="text-sm text-brand-text-light hover:text-brand-dark no-underline">Terms of
+                        Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 </body>
+
 </html>
