@@ -2,7 +2,7 @@
  * API Keys for TheDogAPI and TheCatAPI.
  */
 const DOG_API_KEY = 'live_MDVz1JPcd96dyCiBhfMyOlDkZ0Wi3rPm8Ry6nytOoyjX8gToNkHIC9MUMwxduiVa';
-const CAT_API_KEY = 'live_eSSl0NRUbLiAGq9V39ZgRMcowTENAR89m1L0g3BVwIxbdxBj0rZiroyTgWLenlBc';
+const CAT_API_KEY = 'live_V6UfZeNGHVHQbhWynCTJDWa3HwsbyYBzdAsx23Ep9iQMR1ehy7TL7dHJCS9lmei6';
 
 let allBreeds = []; // Stores all fetched breeds for client-side filtering
 let currentPage = 1;
@@ -132,8 +132,8 @@ async function fetchAllBreedsAndRender() {
 
         // Fetch both concurrently, but failures won't reject the main promise
         const [dogData, catData] = await Promise.all([
-            fetchBreeds('https://api.thedogapi.com/v1/breeds', DOG_API_KEY),
-            fetchBreeds('https://api.thecatapi.com/v1/breeds', CAT_API_KEY)
+            fetchBreeds('https://api.thedogapi.com/v1/breeds?limit=500&page=0', DOG_API_KEY),
+            fetchBreeds('https://api.thecatapi.com/v1/breeds?limit=500&page=0', CAT_API_KEY)
         ]);
 
         const mappedDogBreeds = Array.isArray(dogData) ? dogData.map(breed => ({
