@@ -1,8 +1,6 @@
 const TOTAL_QUESTIONS = 15;
 const GENERAL_QUESTIONS_COUNT = 8;
 
-// Removed Threshold constants (CLEAR_MATCH_THRESHOLD, SUITABLE_THRESHOLD) 
-
 let userScores = {};
 let questionsAsked = new Set();
 let totalAnswered = 0;
@@ -43,7 +41,8 @@ function setupMobileMenu() {
 }
 
 function resetQuiz() {
-    userScores = { dog: 0, cat: 0, smallAnimal: 0, reptile: 0 };
+    // UPDATED: Added bird: 0 to initialization
+    userScores = { dog: 0, cat: 0, smallAnimal: 0, reptile: 0, bird: 0 };
     questionsAsked = new Set();
     totalAnswered = 0;
     lastAnsweredOption = null;
